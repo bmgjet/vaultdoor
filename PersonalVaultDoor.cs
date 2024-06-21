@@ -1,3 +1,12 @@
+/*▄▄▄    ███▄ ▄███▓  ▄████  ▄▄▄██▀▀▀▓█████▄▄▄█████▓
+▓█████▄ ▓██▒▀█▀ ██▒ ██▒ ▀█▒   ▒██   ▓█   ▀▓  ██▒ ▓▒
+▒██▒ ▄██▓██    ▓██░▒██░▄▄▄░   ░██   ▒███  ▒ ▓██░ ▒░
+▒██░█▀  ▒██    ▒██ ░▓█  ██▓▓██▄██▓  ▒▓█  ▄░ ▓██▓ ░ 
+░▓█  ▀█▓▒██▒   ░██▒░▒▓███▀▒ ▓███▒   ░▒████▒ ▒██▒ ░ 
+░▒▓███▀▒░ ▒░   ░  ░ ░▒   ▒  ▒▓▒▒░   ░░ ▒░ ░ ▒ ░░   
+▒░▒   ░ ░  ░      ░  ░   ░  ▒ ░▒░    ░ ░  ░   ░    
+ ░    ░ ░      ░   ░ ░   ░  ░ ░ ░      ░    ░      
+ ░             ░         ░  ░   ░      ░  ░*/
 using Oxide.Game.Rust.Cui;
 using ProtoBuf;
 using Newtonsoft.Json;
@@ -22,19 +31,19 @@ namespace Oxide.Plugins
         {
             [JsonProperty("Vault Max Health")]
             public static float VaultMaxHealth = 2000;
-           
+
             [JsonProperty(PropertyName = "Vault health name color")]
             public static string vaulthealthcolor = "#00FF00";
-           
+
             [JsonProperty(PropertyName = "Range to show health")]
             public static float vaultrange = 3f;
-           
+
             [JsonProperty("Repair Delay")]
             public float RepairDelay = 60;
 
             [JsonProperty("Repair Ammount")]
             public int RepairAmmount = 25;
-           
+
             [JsonProperty("Spawn Cost type (serverrewards,economics,resources)")]
             public string Costtype = "resources";
 
@@ -52,7 +61,7 @@ namespace Oxide.Plugins
 
             [JsonProperty("Charge to craft")]
             public bool craftcosts = true;
-            
+
             [JsonProperty("Repair Cost")]
             //Items and quanity needed to repair
             public Dictionary<string, int> RepairCost = new Dictionary<string, int>
@@ -61,7 +70,7 @@ namespace Oxide.Plugins
                         {"metal.fragments", 100},
                         {"metal.refined", 10},
         };
-            
+
             [JsonProperty("Craft Cost")]
             //Items and quanity needed per craft
             public Dictionary<string, int> CraftCost = new Dictionary<string, int>
@@ -194,9 +203,8 @@ namespace Oxide.Plugins
             plugin = null;
         }
 
-        void OnEntityKill(BaseNetworkable entity)
+        void OnEntityKill(Door entity)
         {
-            if (entity == null) return;
             //Check if vault door
             if (entity.ShortPrefabName == "door.vault.static")
             {
@@ -223,24 +231,32 @@ namespace Oxide.Plugins
             }
         }
 
-        //Code and KeyLock position Fix
-        void OnEntitySpawned(BaseEntity cl)
+        void OnEntitySpawned(CodeLock cl)
         {
-            if (Rust.Application.isLoading) return;
-
-            if (cl == null) { return; }
-            //Checks if codelock/keylock
-            if (cl is CodeLock || cl is KeyLock)
+            BaseEntity Door = cl.GetParentEntity();
+            if (Door != null && Door.ToString().Contains("door.vault.static"))
             {
-                //Checks if its a vault door
-                BaseEntity Door = cl.GetParentEntity();
-                if (Door != null && Door.ToString().Contains("door.vault.static"))
-                {
-                    //Moves codelock and update
-                    cl.transform.localPosition += codeoffset;
-                    cl.SendNetworkUpdateImmediate(true);
-                }
+                //Moves codelock and update
+                cl.transform.localPosition += codeoffset;
+                cl.SendNetworkUpdateImmediate(true);
             }
+        }
+
+        void OnEntitySpawned(KeyLock cl)
+        {
+            BaseEntity Door = cl.GetParentEntity();
+            if (Door != null && Door.ToString().Contains("door.vault.static"))
+            {
+                //Moves codelock and update
+                cl.transform.localPosition += codeoffset;
+                cl.SendNetworkUpdateImmediate(true);
+            }
+        }
+
+        //Code and KeyLock position Fix
+        void OnEntitySpawned(Door cl)
+        {
+            if (Rust.Application.isLoading) { return; }
             //Add component in spawn here so Copypaste can Work with vaultdoors.
             if (cl is Door && cl.ToString().Contains("door.vault.static"))
             {
