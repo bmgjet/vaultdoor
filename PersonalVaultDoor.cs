@@ -17,7 +17,7 @@ using Oxide.Core.Plugins;
 
 namespace Oxide.Plugins
 {
-    [Info("Personal Vault Door", "bmgjet", "1.0.3")]
+    [Info("Personal Vault Door", "bmgjet", "1.0.4")]
     [Description("Lets you place a vault door")]
     public class PersonalVaultDoor : RustPlugin
     {
@@ -238,7 +238,7 @@ namespace Oxide.Plugins
             {
                 //Moves codelock and update
                 cl.transform.localPosition += codeoffset;
-                cl.SendNetworkUpdateImmediate(true);
+                cl.SendNetworkUpdateImmediate();
             }
         }
 
@@ -249,7 +249,7 @@ namespace Oxide.Plugins
             {
                 //Moves codelock and update
                 cl.transform.localPosition += codeoffset;
-                cl.SendNetworkUpdateImmediate(true);
+                cl.SendNetworkUpdateImmediate();
             }
         }
 
@@ -340,7 +340,7 @@ namespace Oxide.Plugins
                         replacement.transform.position = prefabdata.position;
                         replacement.transform.rotation = prefabdata.rotation;
                         replacement.pickup.enabled = false;
-                        replacement.SendNetworkUpdateImmediate(true);
+                        replacement.SendNetworkUpdateImmediate();
                     }
                 }
             }
